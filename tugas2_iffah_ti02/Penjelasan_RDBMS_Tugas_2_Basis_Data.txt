@@ -1,4 +1,7 @@
-Penjelasan RDBMS Tugas Ke-2 Basis Data 
+Iffah Karimah 
+0110222181
+
+Penjelasan RDBMS Tugas Ke-2 Basis Data
 
 1. Relasi one to many dari tabel kategori ke tabel materi
 - Maksud dari relasi one to many dari tabel kategori (one) ke tabel materi (many) adalah dalam satu kategori memiliki beberapa atau banyak materi. Jadi masing-masing materi akan berelasi pada satu kategori.
