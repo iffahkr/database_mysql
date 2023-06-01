@@ -1,0 +1,20 @@
+Penjelasan RDBMS Tugas Ke-2 Basis Data 
+
+1. Relasi one to many dari tabel kategori ke tabel materi
+- Maksud dari relasi one to many dari tabel kategori (one) ke tabel materi (many) adalah dalam satu kategori memiliki beberapa atau banyak materi. Jadi masing-masing materi akan berelasi pada satu kategori.
+- Dimana rujukan ini berupa foreign key bernama "kategori_id" yang ada pada tabel materi. Foreign key ini merujuk pada kolom "id" di dalam tabel kategori.
+
+2. Relasi one to many dari tabel materi ke tabel pengajar
+- Relasi one to many dari tabel materi (one) ke tabel pengajar (many) memiliki arti bahwa hanya satu materi yang dapat diajarkan oleh banyak pengajar. Jadi beberapa pengajar hanya dapat mengambil satu materi. Atau sebaliknya, banyak materi dapat diambil oleh satu pengajar.
+- Dimana relasi ini berupa foreign key bernama "materi_id" di dalam tabel pengajar. Jadi, masing-masing pengajar akan mengambil satu materi, yang mengacu pada kolom "id" di dalam tabel materi.
+
+3. Relasi one to many dari tabel materi ke tabel peserta
+- Relasi one to many dari tabel materi (one) ke tabel peserta (many) berdefinisikan bahwa sejumlah peserta yang terkumpul kedalam satu kelas, akan mengikuti satu materi, yang akan dibawakan oleh satu pengajar. Jadi ringkasnya, sekelompok peserta akan mengikuti satu materi.
+- Di dalam tabel peserta, terdapat foreign key (bernama "materi_id") yang menginduk pada kolom "id" di dalam tabel materi.
+
+4. Relasi many to many dari tabel penjadwalan_kelas ke tabel materi, pengajar, dan peserta.
+- Disini saya menggabungkan penjelasan many to many antara tabel penjadwalan_kelas dengan tabel materi, pengajar, dan peserta karena masing-masing relasi memiliki arti yang sama dan saling berhubungan satu sama lain.
+- Relasi many to many artinya relasi di dalam satu tabel bisa memiliki banyak data di dalam tabel lain.
+- Hal ini, berarti dalam relasi tabel penjadwalan_kelas yang berisikan banyak jadwal kelas, memiliki hubungan ke tabel materi, pengajar, dan peserta, yang isi dari masing-masing tabel memuat jumlah yang banyak juga. 
+- Jadi secara rincinya, tabel penjadwalan kelas berelasi dengan tabel materi, pengajar, dan peserta. Dari relasi ini akan terbuat jadwal yang memuat "id" dari masing-masing tabel materi, pengajar, dan peserta.
+- Dikarenakan ada 3 relasi didalam tabel penjadwalan_kelas, maka juga harus terdapat 3 foreign key, berupa "materi_id", "pengajar_id", dan "peserta_id".
