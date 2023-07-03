@@ -1,0 +1,266 @@
+NIM 	: 0110222181
+Nama 	: Iffah Karimah
+Rombel	: TI02
+
+-- Use toko_online 
+USE toko_online;
+
+
+-- 1. a. Create trigger tambahiStok (untuk mengupdate stok yang ingin ditambah)
+DELIMITER //
+	CREATE TRIGGER tambahiStok
+    AFTER INSERT
+    ON suplai_produk
+    FOR EACH ROW
+BEGIN 
+	-- isi logical sql dari pembuatan trigger
+    UPDATE produk
+    SET stok = stok + NEW.jumlah
+		WHERE id = NEW.produk_id;
+END //
+DELIMITER ;
+
+
+-- 1. b. Create trigger normalisasiStok (untuk mengembalikan stok ke kondisi awal 
+-- 	  apabila pembaharuan dihapus)
+DELIMITER //
+	CREATE TRIGGER normalisasiStok
+    AFTER DELETE
+    ON suplai_produk
+    FOR EACH ROW
+BEGIN 
+	-- isi logical sql dari pembuatan trigger
+    UPDATE produk
+    SET stok = stok - OLD.jumlah
+		WHERE id = OLD.produk_id;
+END //
+DELIMITER ;
+
+
+-- 2. Create inner join di table suplai barang
+SELECT suplai_produk.tgl, produk.nama AS nama_produk, jenis.nama AS nama_jenis, 
+suplai_produk.jumlah, suplier.nama AS nama_suplier
+FROM suplai_produk
+INNER JOIN produk ON suplai_produk.produk_id = produk.id
+INNER JOIN jenis ON produk.jenis_id = jenis.id
+INNER JOIN suplier ON suplai_produk.suplier_id = suplier.id
+
+
+-- 3. a. Create user dengan izin akses mengakses seluruh database dan tabel (Roni)
+CREATE USER 'roni'@'localhost'
+GRANT ALL PRIVILEGES ON *.* TO 'roni'@'localhost' IDENTIFIED BY 'Roni'
+FLUSH PRIVILEGES
+
+-- Show grants Roni
+C:\Windows\System32>mysql -u 'roni' -p
+Enter password: ****
+Welcome to the MariaDB monitor.  Commands end with ; or \g.
+Your MariaDB connection id is 2030
+Server version: 10.4.24-MariaDB mariadb.org binary distribution
+
+Copyright (c) 2000, 2018, Oracle, MariaDB Corporation Ab and others.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+MariaDB [(none)]> show databases;
++----------------------+
+| Database             |
++----------------------+
+| db_koperasi          |
+| db_kursus            |
+| db_mahasiswa         |
+| db_pegawai           |
+| db_pengajuan_pegawai |
+| db_tokobuku          |
+| dbkoperasi1          |
+| dbkursus             |
+| dbmarket             |
+| dbpos                |
+| dbtoko               |
+| dbtokobuku           |
+| dbwarung             |
+| information_schema   |
+| laravelti2           |
+| mysql                |
+| performance_schema   |
+| phpmyadmin           |
+| test                 |
+| toko_online          |
++----------------------+
+20 rows in set (0.001 sec)
+
+MariaDB [(none)]> use db_mahasiswa;
+Database changed
+MariaDB [db_mahasiswa]> show tables;
++------------------------+
+| Tables_in_db_mahasiswa |
++------------------------+
+| tabel_mahasiswa        |
++------------------------+
+1 row in set (0.003 sec)
+
+
+-- 3. b. Create user dengan izin akses memiliki hak ke database toko_online dan seluruh tabel (Desi)
+CREATE USER 'desi'@'localhost'
+GRANT ALL PRIVILEGES ON toko_online.* TO 'desi'@'localhost' IDENTIFIED BY 'Desi'
+FLUSH PRIVILEGES
+
+-- Melihat akses Desi
+C:\Windows\System32>mysql -u 'desi' -p
+Enter password: ****
+Welcome to the MariaDB monitor.  Commands end with ; or \g.
+Your MariaDB connection id is 2032
+Server version: 10.4.24-MariaDB mariadb.org binary distribution
+
+Copyright (c) 2000, 2018, Oracle, MariaDB Corporation Ab and others.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+MariaDB [(none)]> show databases;
++--------------------+
+| Database           |
++--------------------+
+| information_schema |
+| test               |
+| toko_online        |
++--------------------+
+3 rows in set (0.001 sec)
+
+MariaDB [(none)]> use toko_online
+Database changed
+MariaDB [toko_online]> show tables;
++-----------------------+
+| Tables_in_toko_online |
++-----------------------+
+| jenis                 |
+| pelanggan             |
+| pesanan               |
+| produk                |
+| retur                 |
+| suplai_produk         |
+| suplier               |
++-----------------------+
+7 rows in set (0.007 sec)
+
+
+-- 3. c. Create user yang hanya bisa menginput dan select data 
+--       dari tabel jenis dan produk (admin)
+CREATE USER 'zaki'@'localhost'
+GRANT SELECT, INSERT ON toko_online.jenis TO 'zaki'@'localhost' IDENTIFIED BY 'Zaki'
+GRANT SELECT, INSERT ON toko_online.produk TO 'zaki'@'localhost' IDENTIFIED BY 'Zaki'
+FLUSH PRIVILEGES
+SELECT * FROM mysql.user
+
+-- Melihat akses Zaki
+C:\Windows\System32>mysql -u 'zaki' -p
+Enter password: ****
+Welcome to the MariaDB monitor.  Commands end with ; or \g.
+Your MariaDB connection id is 2031
+Server version: 10.4.24-MariaDB mariadb.org binary distribution
+
+Copyright (c) 2000, 2018, Oracle, MariaDB Corporation Ab and others.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+MariaDB [(none)]> show databases;
++--------------------+
+| Database           |
++--------------------+
+| information_schema |
+| test               |
+| toko_online        |
++--------------------+
+3 rows in set (0.001 sec)
+
+MariaDB [(none)]> use toko_online;
+Database changed
+MariaDB [toko_online]> show tables;
++-----------------------+
+| Tables_in_toko_online |
++-----------------------+
+| jenis                 |
+| produk                |
++-----------------------+
+2 rows in set (0.002 sec)
+
+MariaDB [toko_online]> select * from jenis;
++----+------------+
+| id | nama       |
++----+------------+
+|  1 | Elektronik |
+|  2 | Furniture  |
+|  3 | Souvenir   |
++----+------------+
+3 rows in set (0.004 sec)
+
+-- Akses Zaki saat ini
+MariaDB [toko_online]> show grants for 'zaki'@'localhost';
++-------------------------------------------------------------------------------------------------------------+
+| Grants for zaki@localhost                                                                                   |
++-------------------------------------------------------------------------------------------------------------+
+| GRANT USAGE ON *.* TO `zaki`@`localhost` IDENTIFIED BY PASSWORD '*FDC65B3D8D3FD0A1B86173D96CDFDB976442E465' |
+| GRANT SELECT, INSERT ON `toko_online`.`produk` TO `zaki`@`localhost`                                        |
+| GRANT SELECT, INSERT ON `toko_online`.`jenis` TO `zaki`@`localhost`                                         |
++-------------------------------------------------------------------------------------------------------------+
+3 rows in set (0.001 sec)
+
+
+-- Revoke hak akses insert data Zaki 
+REVOKE INSERT ON toko_online.jenis TO 'zaki'@'localhost'
+REVOKE INSERT ON toko_online.produk TO 'zaki'@'localhost'
+FLUSH PRIVILEGES
+
+-- Akses Zaki saat dicabut privileges-nya
+C:\Windows\System32>mysql -u zaki -p
+Enter password: ****
+Welcome to the MariaDB monitor.  Commands end with ; or \g.
+Your MariaDB connection id is 2035
+Server version: 10.4.24-MariaDB mariadb.org binary distribution
+
+Copyright (c) 2000, 2018, Oracle, MariaDB Corporation Ab and others.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+
+MariaDB [(none)]> show grants for 'zaki'@'localhost';
++-------------------------------------------------------------------------------------------------------------+
+| Grants for zaki@localhost                                                                                   |
++-------------------------------------------------------------------------------------------------------------+
+| GRANT USAGE ON *.* TO `zaki`@`localhost` IDENTIFIED BY PASSWORD '*FDC65B3D8D3FD0A1B86173D96CDFDB976442E465' |
+| GRANT SELECT ON `toko_online`.`produk` TO `zaki`@`localhost`                                                |
+| GRANT SELECT ON `toko_online`.`jenis` TO `zaki`@`localhost`                                                 |
++-------------------------------------------------------------------------------------------------------------+
+3 rows in set (0.000 sec)
+
+
+-- Revoke all akses for Desi
+REVOKE ALL ON toko_online.* FROM 'desi'@'localhost'
+FLUSH PRIVILEGES
+
+-- Akses Desi setelah aksesnya dicabut
+C:\Windows\System32>mysql -u desi -p
+Enter password: ****
+Welcome to the MariaDB monitor.  Commands end with ; or \g.
+Your MariaDB connection id is 2036
+Server version: 10.4.24-MariaDB mariadb.org binary distribution
+
+Copyright (c) 2000, 2018, Oracle, MariaDB Corporation Ab and others.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+MariaDB [(none)]> show grants for 'desi'@'localhost';
++-------------------------------------------------------------------------------------------------------------+
+| Grants for desi@localhost                                                                                   |
++-------------------------------------------------------------------------------------------------------------+
+| GRANT USAGE ON *.* TO `desi`@`localhost` IDENTIFIED BY PASSWORD '*F6252300A78CE2C4D008B0E0CCDDC507FF5B9A2F' |
++-------------------------------------------------------------------------------------------------------------+
+1 row in set (0.000 sec)
+
+MariaDB [(none)]> show databases;
++--------------------+
+| Database           |
++--------------------+
+| information_schema |
+| test               |
++--------------------+
+2 rows in set (0.001 sec)
